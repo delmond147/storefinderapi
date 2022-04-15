@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+django-rest-swagger = "*"
+drf-yasg = "*"
+django-cors-headers = "*"
+pillow = "*"
+djangorestframework-simplejwt = "*"
+google = "*"
+google-api-core = "*"
+facebook-sdk = "*"
+django-allauth = "*"
+django-location-field = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
