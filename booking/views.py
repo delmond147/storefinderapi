@@ -19,7 +19,7 @@ class BookingListAPIView(ListCreateAPIView):
         return self.query.filter(owner=self.request.user)
 
 
-class BookingDetialsAPIView(RetrieveUpdateDestroyAPIView):
+class BookingDetailsAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = BookingSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwner,)
     query = Booking.objects.all()

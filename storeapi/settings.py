@@ -27,12 +27,13 @@ SECRET_KEY = 'django-insecure-&d@5%dh+bo4-c(&6#u7-bkc-j0d=yj_ptf3!(wf^c!j%i(vrr_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.211.99.29', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.43.70', 'localhost', '127.0.0.1']
 
 AUTH_USER_MODEL = "authentication.User"
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,10 +57,10 @@ INSTALLED_APPS = [
 ]
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
+        "Auth Token eg [Bearer (JWT)": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }
@@ -69,6 +70,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -96,6 +98,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'storeapi.wsgi.application'
 
 # CORS_WHITELIST
+
+# CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     # "https://store-finder.netlify.app",
@@ -168,11 +172,23 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
+
+FRONTEND_URL = os.environ.get('FRONTEND_URL')
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -188,40 +204,100 @@ LOCATION_FIELD = {
     'search.suffix': '',
 
     'provider.google.api': '//www.maps.google.com/maps/api/js?sensor=false',
-    'provider.google.api_key': 'AIzaSyD8BYhSB_lQQeoTOl2B3tJxBK4bGdhn8C8',
+    'provider.google.api_key': os.environ.get('GOOGLE_MAPS_API_KEY'),
     'provider.google.api_libraries': '',
     'provider.google.map.type': 'ROADMAP',
     
 }
 
 
-# LOCATION_FIELD_PATH = settings.STATIC_URL + 'location_field'
+# django-admin dashboard settings
+JAZZMIN_SETTINGS = {
+     # title of the window (Will default to current_admin_site.site_title if absent or None)
+    "site_title": "Admin",
 
-# LOCATION_FIELD = {
-#     'map.provider': 'google',
-#     'map.zoom': 13,
+    # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
+    "site_header": "Store Finder",
 
-#     'search.provider': 'google',
-#     'search.suffix': '',
+    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
+    "site_brand": "S.FINDER",
+    
+    #  customize the ui
+    # "show_ui_builder": True,
+    
+    # CSS classes that are applied to the logo above
+    "site_logo_classes": "img-circle",
 
-#     # Google
-#     'provider.google.api': '//maps.google.com/maps/api/js',
-#     'provider.google.api_key': 'AIzaSyBOeWDPnnEtxkMF4zoLs1qwCUhP4Z2fhy0',
-#     'provider.google.map_type': 'ROADMAP',
+    # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
+    "site_icon": None,
 
-#     # Mapbox
-#     'provider.mapbox.access_token': '',
-#     'provider.mapbox.max_zoom': 18,
-#     'provider.mapbox.id': 'mapbox.streets',
+    # Welcome text on the login screen
+    "welcome_sign": "Welcome to Store Finder",
 
-#     # OpenStreetMap
-#     'provider.openstreetmap.max_zoom': 18,
+    # Copyright on the footer
+    "copyright": "Dgitech",
 
-#     # misc
-#     'resources.root_path': LOCATION_FIELD_PATH,
-#     'resources.media': {
-#         'js': [
-#             LOCATION_FIELD_PATH + '/js/form.js',
-#         ],
-#     },
-# }
+    # The model admin to search from the search bar, search bar omitted if excluded
+    "search_model": "auth.User",
+
+    # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
+    "user_avatar": "avatar",
+    
+    ###########
+    #   Top Menu    #
+    "topmenu_links": [
+        # url that gets reversed (permission can be added)
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Support", "url": "dgitech.com", "new_window": True},
+        {"model": "auth.User"},
+        
+    ],
+    
+    ###########
+    #   User Menu   #
+    "usermenu_links": [
+        {"name": "Reports", "url": "sfinder.com/reports", "new_window": True},
+        {"model": "auth.User"},
+    ],
+    
+    ###############
+    #   Sidebar  #
+    
+    
+}
+
+
+
+# jazzmin ui styles
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-green",
+    "accent": "accent-primary",
+    "navbar": "navbar-primary navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": True,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-danger",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}

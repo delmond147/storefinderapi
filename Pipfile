@@ -16,6 +16,11 @@ google-api-core = "*"
 facebook-sdk = "*"
 django-allauth = "*"
 django-location-field = "*"
+django-momoapi = "*"
+environ = "*"
+stripe = "*"
+geocoder = "*"
+django-jazzmin = "*"
 
 [dev-packages]
 

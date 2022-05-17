@@ -36,12 +36,12 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('authentication/', include('authentication.urls')),
-    path('social-authentication/', include(('social_auth.urls', 'social_auth'), namespace="social_auth")),
+    path('auth/', include('authentication.urls')),
+    path('social-auth/', include(('social_auth.urls', 'social_auth'), namespace="social_auth")),
     
     path('stores/', include('store.urls')),
     path('booking/', include('booking.urls')),
-    path('payment/', include('payment.urls')),
+    # path('payment/', include('payment.urls')),
 
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/api.json/', schema_view.without_ui(cache_timeout=0), name='schema-swagger-ui'),

@@ -38,6 +38,7 @@ AUTH_PROVIDERS = {'facebook': 'facebook', 'google': 'google', 'email': 'email'}
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.EmailField(max_length=255, unique=True, db_index=True)
+    avatar = models.ImageField('profile picture', upload_to='static/media/images/avatars/', null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

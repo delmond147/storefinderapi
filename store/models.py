@@ -29,14 +29,14 @@ class Store(models.Model):
     ]
 
 
-    category = models.CharField(choices=SOURCE_OPTIONS, max_length=255, default='FASHION')
-    name = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=12, decimal_places=2, max_length=255)
+    category = models.CharField("Choose your category", choices=SOURCE_OPTIONS, max_length=255, default='FASHION')
+    name = models.CharField("Store name", max_length=255)
+    price = models.DecimalField("Amount", max_digits=12, decimal_places=2, max_length=255)
     description = models.TextField(max_length=255)
-    status = models.CharField(choices=STATUS, max_length=255)
+    status = models.BooleanField(default=False)
     owner = models.ForeignKey(to=User, on_delete=models.CASCADE)
     city = models.CharField(max_length=255)
-    location = PlainLocationField(based_fields=['city'], zoom=7)
+    location = PlainLocationField(based_fields=['city'], zoom=7, blank=True, null=True)
     image = models.ImageField(upload_to='images', height_field=None, width_field=None)
     date = models.DateField(null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
